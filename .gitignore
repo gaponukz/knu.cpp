@@ -6,7 +6,7 @@
 *.ko
 *.obj
 *.elf
-
+*.opendb
 # Linker output
 *.ilk
 *.map
