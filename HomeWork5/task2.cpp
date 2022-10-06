@@ -50,7 +50,7 @@ double function(unsigned int n) {
 }
 
 int main(int argc, char **argv) {
-    const unsigned int n = 5;
+    const unsigned int n = 3;
 
     printf("S(%d) = %lf", n, function(n));
     return 0;
