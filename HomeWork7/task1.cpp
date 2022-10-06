@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     }
 
     for (int i = 0; i < SIZE; i++) {
-        if (is_fibonacci(array[i])) {
+        if (is_fibonacci(*(array + i))) {
             result += 1;
         }
     }

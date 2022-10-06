@@ -2,12 +2,12 @@
 #define SIZE 5
 
 double max_odd_index_number(double *_array, int _count) {
-    double maximum = _array[0];
+    double maximum = *_array;
     int index = 2;
 
     while (index < _count) {
-        if (maximum < _array[index]) {
-            maximum = _array[index];
+        if (maximum < *(_array + index)) {
+            maximum = *(_array + index);
         }
 
         index += 2;
