@@ -9,7 +9,6 @@ int main(int argc, char* argv[]) {
     ofstream output;
     file.open("task2_input.txt");
     output.open("task2_output.txt");
-    // file.ignore(';');
 
     while (!file.eof()) {
         double number;
@@ -22,6 +21,8 @@ int main(int argc, char* argv[]) {
 
         if (!file.good()) {
             break;
+        } else {
+            file.ignore(256, ';');
         }
     }
 
