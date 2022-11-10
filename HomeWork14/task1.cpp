@@ -1,13 +1,30 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#define ALPHABET_COUNT 26
 
 using namespace std;
 
+string encrypt(const string text) {
+    string result;
+    const string blacklist = ",./ -(){}!?:;";
+ 
+    for (int i = 0; i < text.length(); i++) {
+        if (blacklist.find(text[i]) != std::string::npos) {
+            result += text[i];
+
+        } else if (isupper(text[i])) {
+            result += char(int(text[i] - 64) % 26 + 65);
+            
+        } else {
+            result += char(int(text[i] - 96) % 26 + 97);
+        }
+    }
+
+    return result;
+}
+
 int main(int argc, char** argv) {
     string data;
-    char alphabet[ALPHABET_COUNT];
     ifstream file("task1.txt");
 
     string line;
@@ -17,27 +34,11 @@ int main(int argc, char** argv) {
 
     file.close();
 
-    unsigned short int index = 0;
+    ofstream output;
 
-    for (char l = 'a'; l <= 'z'; ++l) {
-        alphabet[index] = l;
-        index++;
-    }
-    
-    for (auto i = 0; i < data.length(); i++) {
-        for (auto j = 0; j < ALPHABET_COUNT; j++) {
-            if (data[i] == alphabet[j]) {
-                cout << "here" << endl;
-                if (j != ALPHABET_COUNT) {
-                    data[i] = alphabet[j+1];
-                } else {
-                    data[i] = alphabet[0];
-                }
-            }
-        }
-    }
-
-    cout << data << endl;
+    output.open ("task1.txt");
+    output << encrypt(data);
+    output.close();
 
     return 0;
 }
