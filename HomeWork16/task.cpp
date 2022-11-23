@@ -1,10 +1,9 @@
 #include <iostream>
 #include <string>
-#include <cmath>
 
 using namespace std;
 
-class World {
+class Word {
     protected:
     
     string prefix;
@@ -15,13 +14,18 @@ class World {
 
     public:
 
-    World() {}
-    World(string prefix, string second_prefix, string root, string suffix, string end) {
+    Word() {}
+    Word(string root) { this->root = root; }
+    Word(string prefix, string second_prefix, string root, string suffix, string end) {
         this->prefix = prefix;
         this->second_prefix = second_prefix;
         this->root = root;
         this->suffix = suffix;
         this->end = end;
+    }
+
+    string get_word() {
+        return this->prefix + this->second_prefix + this->root + this->suffix + this->end;
     }
 
     void set_prefix(string prefix) { this->prefix = prefix; }
@@ -44,70 +48,105 @@ class World {
 
     string get_end() { return this->end; }
 
+    friend ostream& operator<<(ostream& os, Word &Word) {
+        os << Word.get_word();
+        return os;
+    }
+
 };
 
-// https://englishprime.ua/uk/padezhi-v-anglijskom/
-
-class Verb: public World {
+class Verb: public Word {
     public:
+    using Word::Word;
 
-    string gender(string gender = "male") {}
+    void plural() {
+        this->set_end("s");
+    }
 
-    string plural() {}
+    void singular() {
+        this->set_end("");
+    }
 
-    string singular() {}
-
-    string third() {}
-
-    string word_case(string _case) {
-        if (_case == "common") { }
-        else if (_case == "genetive") {}
-        else if (_case == "davite") {}
-        else if (_case == "ablative") {}
-        else if (_case == "possessive") {}
+    void third() {
+        this->set_end("es");
     }
 };
 
-class Noun : public World {
+class Noun : public Word {
+    private:
+    bool is_plural = false;
+
     public:
 
-    string gender(string gender = "male") {}
+    using Word::Word;
 
-    string plural() {}
+    void plural() {
+        this->is_plural = true;
+        this->set_end("s");
+    }
 
-    string singular() {}
+    void singular() {
+        this->is_plural = false;
+        this->set_end("");
+    }
 
-    string third() {}
+    void to_word_case(string _case) {
+        if (_case == "common") {
+            this->set_end("");
+        } else if (_case == "possessive") {
+            if (!this->is_plural) {
+                this->set_end("'s");
 
-    string word_case(string _case) {
-        if (_case == "common") { }
-        else if (_case == "genetive") {}
-        else if (_case == "davite") {}
-        else if (_case == "ablative") {}
-        else if (_case == "possessive") {}
+            } else {
+                this->set_end("s'");
+            }
+        }
     }
 };
 
-class Adjecvite : public World {
+class Adjective : public Word {
     public:
 
-    string gender(string gender = "male") {}
+    using Word::Word;
 
-    string plural() {}
+    void comparison_first() {
+        this->set_suffix("");
+        this->set_end("");
+    }
 
-    string singular() {}
+    void comparison_second() {
+        size_t root_length = this->get_root().length();
+        this->set_suffix(string(1, this->get_root()[root_length-1]));
+        this->set_end("er");
+    }
 
-    string third() {}
-
-    string word_case(string _case) {
-        if (_case == "common") { }
-        else if (_case == "genetive") {}
-        else if (_case == "davite") {}
-        else if (_case == "ablative") {}
-        else if (_case == "possessive") {}
+    void comparison_max() {
+        size_t root_length = this->get_root().length();
+        this->set_suffix(string(1, this->get_root()[root_length-1]));
+        this->set_end("est");
     }
 };
 
 int main(int argc, char** argv) {
+    Adjective adjective("big");
+    adjective.comparison_second();
+    cout << adjective << endl;
+    adjective.comparison_max();
+    cout << adjective << endl;
+    adjective.comparison_first();
+    cout << adjective << endl;
+
+    Verb verb("enjoy");
+    verb.plural();
+    cout << verb << endl;
+    verb.singular();
+    cout << verb << endl;
+
+    Noun noun("teacher");
+    noun.plural();
+    cout << noun << endl;
+    noun.to_word_case("possessive");
+    cout << noun << endl;
+
     return 0;
 }
