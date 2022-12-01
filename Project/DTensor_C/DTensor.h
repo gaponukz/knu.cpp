@@ -1,1 +1,5 @@
-const bool is_pzdz = 1;
+#include "stdio.h"
+
+struct Tensor {
+    int shape;
+};
