@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+
 // Abstract data type linked list
 typedef struct MemoryItem MemoryItem;
 struct MemoryItem{
@@ -64,7 +65,6 @@ MemoryItem* copy_ndim_array(MemoryItem *array, int dimension, const int *shape, 
     }
     return result;
 }
-
 
 /**
  * Main constructor, from technical task
