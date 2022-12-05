@@ -1,15 +1,28 @@
 #include "DTensor.h"
 #include "stdio.h"
 
+double sum(double a, double b) {
+    return a + b;
+}
+
+Tensor add(Tensor tensor, double singleElement) {
+    Tensor result = TensorInit(tensor.number_dim, tensor.mShape);
+    unary_operation(tensor, sum, tensor.mArray, singleElement, result.mArray, tensor.number_dim, tensor.mShape, 0);
+    
+    return result;
+}
+
 int main(int argc, char **argv) {
-    const short int dim = 2;
-    const short int n = 2;
-    const short int m = 3;
+    const int dim = 2;
+    const int n = 2;
+    const int m = 3;
 
     int shape[2] = {2, 3};
     int values[6] = {0, 1, 2, 3, 4, 5};
-    Tensor test1 = TensorInitZero(dim, shape);
+    Tensor test1 = TensorInit(dim, shape);
 
-    print(test1);
+    Tensor test2 = add(test1, 3);
+
+    print(test2);
     return 0;
 }

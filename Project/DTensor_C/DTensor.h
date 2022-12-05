@@ -1,11 +1,22 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#define TensorInitWrapper(x, y, z) _Generic(x, MemoryItem*: TensorInitFull, int:  TensorInitZero, double: TensorInitOne)(x, y, z)
+
+#define TENSOR_INIT_1_ARGS(x) TensorInitWrapper(x, NULL, NULL)
+#define TENSOR_INIT_2_ARGS(x, y) TensorInitWrapper(x, y, NULL)
+#define TENSOR_INIT_3_ARGS(x, y, z) TensorInitWrapper(x, y, z)
+
+#define GET_4TH_ARG(arg1, arg2, arg3, arg4, ...) arg4
+#define TENSOR_INIT_MACRO_CHOOSER(...) GET_4TH_ARG(__VA_ARGS__, TENSOR_INIT_3_ARGS, TENSOR_INIT_2_ARGS, TENSOR_INIT_1_ARGS, )
+
+#define TensorInit(...) TENSOR_INIT_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
 // Abstract data type linked list
 typedef struct MemoryItem MemoryItem;
 struct MemoryItem{
     double value;
-    MemoryItem *next;
+    MemoryItem *next; 
 };
 
 typedef struct Tensor Tensor;
@@ -86,7 +97,7 @@ Tensor TensorInitFull(MemoryItem* array, int dimension, const int *shape) {
     return tensor;
 }
 
-Tensor TensorInitZero(int dimension, const int *shape) {
+Tensor TensorInitZero(int dimension, const int *shape, ...) {
     Tensor tensor;
     tensor.number_dim = dimension;
     tensor.mShape = (int*)malloc(dimension * sizeof(int));
@@ -100,7 +111,7 @@ Tensor TensorInitZero(int dimension, const int *shape) {
     return tensor;
 }
 
-Tensor TensorInitOne(double element) {
+Tensor TensorInitOne(double element, ...) {
     Tensor tensor;
     tensor.mShape = (int*)malloc(sizeof(int));
     tensor.mShape[0] = 1;
