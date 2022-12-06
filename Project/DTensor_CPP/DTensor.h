@@ -1,9 +1,9 @@
 #include <iostream>
 
 // Abstract data type linked list
-template<typename TYPE>struct MemoryItem{
+template<typename TYPE>struct LinkedList{
     TYPE value;
-    MemoryItem *next;
+    LinkedList *next;
 };
 
 // Main class
@@ -56,35 +56,35 @@ public:
 private:
 
     int number_dim = 0;
-    MemoryItem<TYPE> *mArray;
+    LinkedList<TYPE> *mArray;
     int *mShape;
 
-    Tensor(MemoryItem<TYPE> *array, int dimension, const int *shape);
-    MemoryItem<TYPE> *create_ndim_array(int dimension, const int *shape, int dimLevel);
-    MemoryItem<TYPE> *create_ndim_array(int dimension, const int *shape);
-    MemoryItem<TYPE> *copy_ndim_array(MemoryItem<TYPE> *array,int dimension, const int *shape,  int dimLevel);
+    Tensor(LinkedList<TYPE> *array, int dimension, const int *shape);
+    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape, int dimLevel);
+    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape);
+    LinkedList<TYPE> *copy_ndim_array(LinkedList<TYPE> *array,int dimension, const int *shape,  int dimLevel);
 
-    void delete_ndim_array(MemoryItem<TYPE> *array, int dimension, const int *shape, int dimLevel);
-    void delete_ndim_array(MemoryItem<TYPE> *array, int dimension, const int *shape);
-    void create_chain(MemoryItem<TYPE> *array, int dimLevel, TYPE *resArray, int &startIndex);
-    void fill_array_from_chain(MemoryItem<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex);
+    void delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel);
+    void delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape);
+    void create_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *resArray, int &startIndex);
+    void fill_array_from_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex);
 
-    void print_ndim_array(std::ostream &stream, MemoryItem<TYPE> *array, int dimension, const int *shape, int dimLevel);
-    void copy_values(MemoryItem<TYPE> *array1, MemoryItem<TYPE> *array2, int dimension, const int *shape, int dimLevel);
-    void unary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), MemoryItem<TYPE> *array, TYPE singleElement, MemoryItem<TYPE> *resArray, int dimension, const int *shape, int dimLevel);
-    void binary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), MemoryItem<TYPE> *array1, MemoryItem<TYPE> *array2, MemoryItem<TYPE> *resArray, int dimensional, const int *shape, int dimLevel);
-    bool is_equal(MemoryItem<TYPE> *array1, MemoryItem<TYPE> *array2, int dimensional, const int *shape, int dimLevel);
+    void print_ndim_array(std::ostream &stream, LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel);
+    void copy_values(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimension, const int *shape, int dimLevel);
+    void unary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), LinkedList<TYPE> *array, TYPE singleElement, LinkedList<TYPE> *resArray, int dimension, const int *shape, int dimLevel);
+    void binary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, LinkedList<TYPE> *resArray, int dimensional, const int *shape, int dimLevel);
+    bool is_equal(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimensional, const int *shape, int dimLevel);
 };
 
-template<typename TYPE>MemoryItem<TYPE>* Tensor<TYPE>::create_ndim_array(int dimension, const int *shape, int dimLevel) {
+template<typename TYPE>LinkedList<TYPE>* Tensor<TYPE>::create_ndim_array(int dimension, const int *shape, int dimLevel) {
     if (dimension < 1) {
         return nullptr;
 
     } else {
-        auto *res = new MemoryItem<TYPE>[shape[dimLevel]];
+        auto *res = new LinkedList<TYPE>[shape[dimLevel]];
 
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
-            res[itr] = MemoryItem<TYPE>();
+            res[itr] = LinkedList<TYPE>();
 
             if (dimension == 1) {
                 res[itr].next = nullptr;
@@ -100,11 +100,11 @@ template<typename TYPE>MemoryItem<TYPE>* Tensor<TYPE>::create_ndim_array(int dim
     }
 }
 
-template<typename TYPE>MemoryItem<TYPE>* Tensor<TYPE>::create_ndim_array(int dimension, const int *shape) {
+template<typename TYPE>LinkedList<TYPE>* Tensor<TYPE>::create_ndim_array(int dimension, const int *shape) {
     return create_ndim_array(dimension, shape, 0);
 }
 
-template <typename TYPE>void Tensor<TYPE>::delete_ndim_array(MemoryItem<TYPE> *array, int dimension, const int *shape, int dimLevel) {
+template <typename TYPE>void Tensor<TYPE>::delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel) {
     if (dimension > 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             delete_ndim_array(array[itr].next, dimension - 1, shape, dimLevel + 1);
@@ -114,15 +114,15 @@ template <typename TYPE>void Tensor<TYPE>::delete_ndim_array(MemoryItem<TYPE> *a
     delete[] array;
 }
 
-template <typename TYPE>MemoryItem<TYPE>* Tensor<TYPE>::copy_ndim_array(MemoryItem<TYPE> *array,int dimension, const int *shape, int dimLevel) {
+template <typename TYPE>LinkedList<TYPE>* Tensor<TYPE>::copy_ndim_array(LinkedList<TYPE> *array,int dimension, const int *shape, int dimLevel) {
     if (dimension < 1) {
         return nullptr;
     }
 
-    auto *result = new MemoryItem<TYPE>[shape[dimLevel]];
+    auto *result = new LinkedList<TYPE>[shape[dimLevel]];
 
     for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
-        MemoryItem<TYPE> tmp;
+        LinkedList<TYPE> tmp;
     
         if (dimension > 1) {
             tmp.next = copy_ndim_array(array[itr].next, dimension-1, shape, dimLevel + 1);
@@ -138,7 +138,7 @@ template <typename TYPE>MemoryItem<TYPE>* Tensor<TYPE>::copy_ndim_array(MemoryIt
     return result;
 }
 
-template <typename TYPE>void Tensor<TYPE>::delete_ndim_array(MemoryItem<TYPE> *array, int dimension, const int *shape) {
+template <typename TYPE>void Tensor<TYPE>::delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape) {
     delete_ndim_array(array, dimension, shape, 0);
 }
 
@@ -146,7 +146,7 @@ template <typename TYPE>void Tensor<TYPE>::delete_ndim_array(MemoryItem<TYPE> *a
 template<typename TYPE>Tensor<TYPE>::Tensor(TYPE element):mShape(nullptr),mArray(nullptr) {
     mShape = new int[1];
     mShape[0] = 1;
-    mArray = new MemoryItem<TYPE>[1];
+    mArray = new LinkedList<TYPE>[1];
     mArray[0].next = nullptr;
     mArray[0].value = element;
     number_dim = 1;
@@ -155,9 +155,22 @@ template<typename TYPE>Tensor<TYPE>::Tensor(TYPE element):mShape(nullptr),mArray
 /**
  * Main constructor, from technical task
  * 
+ * @param LinkedList* масив даних тензору
  * @param int dimension: натуральне число – кількість N розмірностей тензору; 
  * @param const int *shape: вказівник на натуральні числа, - це масив з N чисел, величини першоЇ, другої … N-тої розмірності даного тензору
 */
+
+template<typename TYPE>Tensor<TYPE>::Tensor(LinkedList<TYPE> *array, int dimension, const int *shape):mShape(nullptr),mArray(nullptr) {
+    number_dim = dimension;
+    mShape = new int[dimension];
+
+    for (size_t itr = 0; itr < dimension; ++itr) {
+        mShape[itr] = shape[itr];
+    }
+
+    mArray = array;
+}
+
 template<typename TYPE>Tensor<TYPE>::Tensor(int dimension, const int *shape):mShape(nullptr),mArray(nullptr) {
     number_dim = dimension;
     mShape = new int[dimension];
@@ -169,17 +182,6 @@ template<typename TYPE>Tensor<TYPE>::Tensor(int dimension, const int *shape):mSh
     mArray = create_ndim_array(dimension, shape);
 }
 
-template<typename TYPE>Tensor<TYPE>::Tensor(MemoryItem<TYPE> *array, int dimension, const int *shape):mShape(nullptr),mArray(nullptr) {
-    number_dim = dimension;
-    mShape = new int[dimension];
-
-    for (size_t itr = 0; itr < dimension; ++itr) {
-        mShape[itr] = shape[itr];
-    }
-
-    mArray = array;
-}
-
 // Dectructor
 template <typename TYPE>Tensor<TYPE>::~Tensor() {
     delete_ndim_array(mArray, number_dim, mShape);
@@ -187,7 +189,7 @@ template <typename TYPE>Tensor<TYPE>::~Tensor() {
     number_dim = 0;
 }
 
-template<typename TYPE>void Tensor<TYPE>::create_chain(MemoryItem<TYPE> *array, int dimLevel, TYPE *resArray, int &startIndex) {
+template<typename TYPE>void Tensor<TYPE>::create_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *resArray, int &startIndex) {
     if (number_dim - dimLevel < 1) {
         return;
     
@@ -222,7 +224,7 @@ template<typename TYPE>TYPE* Tensor<TYPE>::chain() {
     }
 }
 
-template <typename TYPE>void Tensor<TYPE>::fill_array_from_chain(MemoryItem<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex) {
+template <typename TYPE>void Tensor<TYPE>::fill_array_from_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex) {
     if (number_dim - dimLevel < 1) {
         return;
 
@@ -264,7 +266,7 @@ template<typename TYPE>void Tensor<TYPE>::reshape(int new_dimension, const int *
 
     TYPE *_chain = chain();
 
-    MemoryItem<TYPE> *newArray = create_ndim_array(new_dimension, new_shape);
+    LinkedList<TYPE> *newArray = create_ndim_array(new_dimension, new_shape);
     number_dim = new_dimension;
     mShape = new int[new_dimension];
 
@@ -337,7 +339,7 @@ template<typename TYPE>void Tensor<TYPE>::write(std::ostream &stream) {
     stream << std::endl;
 }
 
-template<typename TYPE>void Tensor<TYPE>::print_ndim_array(std::ostream &stream, MemoryItem<TYPE> *array, int dimension, const int *shape, int dimLevel) {
+template<typename TYPE>void Tensor<TYPE>::print_ndim_array(std::ostream &stream, LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel) {
     if (dimension == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             stream << array[itr].value << ' ';
@@ -354,7 +356,7 @@ template<typename TYPE>void Tensor<TYPE>::print_ndim_array(std::ostream &stream,
     }
 }
 
-template <typename TYPE>void Tensor<TYPE>::copy_values(MemoryItem<TYPE> *array1, MemoryItem<TYPE> *array2, int dimension, const int *shape, int dimLevel) {
+template <typename TYPE>void Tensor<TYPE>::copy_values(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimension, const int *shape, int dimLevel) {
     if (dimension == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             array1[itr].value = array2[itr].value;
@@ -367,7 +369,7 @@ template <typename TYPE>void Tensor<TYPE>::copy_values(MemoryItem<TYPE> *array1,
     }
 }
 
-template <typename TYPE>void Tensor<TYPE>::unary_operation(TYPE (*ptr2Func)(TYPE ,TYPE ), MemoryItem<TYPE> *array, TYPE singleElement, MemoryItem<TYPE> *resArray, int dimension, const int *shape, int dimLevel) {
+template <typename TYPE>void Tensor<TYPE>::unary_operation(TYPE (*ptr2Func)(TYPE ,TYPE ), LinkedList<TYPE> *array, TYPE singleElement, LinkedList<TYPE> *resArray, int dimension, const int *shape, int dimLevel) {
     if (dimension == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             resArray[itr].value = (*ptr2Func)(array[itr].value, singleElement);
@@ -380,7 +382,7 @@ template <typename TYPE>void Tensor<TYPE>::unary_operation(TYPE (*ptr2Func)(TYPE
     }
 }
 
-template <typename TYPE>void Tensor<TYPE>::binary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), MemoryItem<TYPE> *array1, MemoryItem<TYPE> *array2, MemoryItem<TYPE> *resArray, int dimensional, const int *shape, int dimLevel) {
+template <typename TYPE>void Tensor<TYPE>::binary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, LinkedList<TYPE> *resArray, int dimensional, const int *shape, int dimLevel) {
     if (dimensional == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             resArray[itr].value = (*ptr2Func)(array1[itr].value, array2[itr].value);
@@ -483,7 +485,7 @@ template <typename TYPE>bool Tensor<TYPE>::operator==(const Tensor<TYPE> &other)
     return is_equal(this->mArray, other.mArray, number_dim, mShape, 0);
 }
 
-template <typename TYPE>bool Tensor<TYPE>::is_equal(MemoryItem<TYPE> *array1, MemoryItem<TYPE> *array2, int dimensional, const int *shape, int dimLevel) {
+template <typename TYPE>bool Tensor<TYPE>::is_equal(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimensional, const int *shape, int dimLevel) {
     if (dimensional == 1) {
         return array1[0].value == array2[0].value;
     } else {

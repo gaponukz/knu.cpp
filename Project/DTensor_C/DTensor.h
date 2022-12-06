@@ -10,25 +10,24 @@
 
 #define TensorInit(...) TENSOR_INIT_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
-// Abstract data type linked list
-typedef struct MemoryItem MemoryItem;
-struct MemoryItem{
+typedef struct LinkedList LinkedList;
+struct LinkedList{
     double value;
-    MemoryItem *next; 
+    LinkedList *next; 
 };
 
 typedef struct Tensor Tensor;
 struct Tensor {
     int number_dim;
-    MemoryItem *mArray;
+    LinkedList *mArray;
     int *mShape;
 };
 
-MemoryItem* create_ndim_array(int dimension, const int *shape, int dimLevel) {
-    MemoryItem *res = (MemoryItem*)malloc(shape[dimLevel] * sizeof(MemoryItem));
+LinkedList* create_ndim_array(int dimension, const int *shape, int dimLevel) {
+    LinkedList *res = (LinkedList*)malloc(shape[dimLevel] * sizeof(LinkedList));
 
     for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
-        MemoryItem item;
+        LinkedList item;
         res[itr] = item;
 
         if (dimension == 1) {
@@ -45,7 +44,7 @@ MemoryItem* create_ndim_array(int dimension, const int *shape, int dimLevel) {
 
 }
 
-void delete_ndim_array(MemoryItem* array, int dimension, const int *shape, int dimLevel) {
+void delete_ndim_array(LinkedList* array, int dimension, const int *shape, int dimLevel) {
     if (dimension > 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             delete_ndim_array(array[itr].next, dimension - 1, shape, dimLevel + 1);
@@ -55,11 +54,11 @@ void delete_ndim_array(MemoryItem* array, int dimension, const int *shape, int d
     free(array);
 }
 
-MemoryItem* copy_ndim_array(MemoryItem *array, int dimension, const int *shape, int dimLevel) {
-    MemoryItem *result = (MemoryItem*)malloc(shape[dimLevel] * sizeof(MemoryItem));
+LinkedList* copy_ndim_array(LinkedList *array, int dimension, const int *shape, int dimLevel) {
+    LinkedList *result = (LinkedList*)malloc(shape[dimLevel] * sizeof(LinkedList));
 
     for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
-        MemoryItem tmp;
+        LinkedList tmp;
     
         if (dimension > 1) {
             tmp.next = copy_ndim_array(array[itr].next, dimension-1, shape, dimLevel + 1);
@@ -78,10 +77,11 @@ MemoryItem* copy_ndim_array(MemoryItem *array, int dimension, const int *shape, 
 /**
  * Main constructor, from technical task
  * 
+ * @param LinkedList* масив даних тензору
  * @param int dimension: натуральне число – кількість N розмірностей тензору; 
  * @param const int *shape: вказівник на натуральні числа, - це масив з N чисел, величини першоЇ, другої … N-тої розмірності даного тензору
 */
-Tensor TensorInitFull(MemoryItem* array, int dimension, const int *shape) {
+Tensor TensorInitFull(LinkedList* array, int dimension, const int *shape) {
     Tensor tensor;
     tensor.number_dim = dimension;
     tensor.mShape = (int*)malloc(dimension * sizeof(int));
@@ -113,7 +113,7 @@ Tensor TensorInitOne(double element) {
     Tensor tensor;
     tensor.mShape = (int*)malloc(sizeof(int));
     tensor.mShape[0] = 1;
-    tensor.mArray = (MemoryItem*)malloc(sizeof(MemoryItem));
+    tensor.mArray = (LinkedList*)malloc(sizeof(LinkedList));
     tensor.mArray[0].next = NULL;
     tensor.mArray[0].value = element;
     tensor.number_dim = 1;
@@ -129,18 +129,18 @@ Tensor at(Tensor tensor, int i) {
             new_shape[itr] = tensor.mShape[itr+1];
         }
         
-        Tensor result = TensorInitFull(tensor.mArray[i].next, tensor.number_dim - 1, new_shape);
+        Tensor result = TensorInit(tensor.mArray[i].next, tensor.number_dim - 1, new_shape);
         return result;
 
     } else {
         int* tmpShape = (int*)malloc(sizeof(int));
         tmpShape[0] = 1;
-        Tensor res = TensorInitFull(&tensor.mArray[i], 1, tmpShape);
+        Tensor res = TensorInit(&tensor.mArray[i], 1, tmpShape);
         return res;
     }
 }
 
-void create_chain(Tensor tensor, MemoryItem* array, int dimLevel, double *resArray, int startIndex) {
+void create_chain(Tensor tensor, LinkedList* array, int dimLevel, double *resArray, int startIndex) {
     if (tensor.number_dim - dimLevel < 1) {
         return;
     
@@ -171,7 +171,7 @@ double* chain(Tensor tensor) {
 
 }
 
-void fill_array_from_chain(Tensor tensor, MemoryItem* array, int dimLevel, double *_chain, int startIndex) {
+void fill_array_from_chain(Tensor tensor, LinkedList* array, int dimLevel, double *_chain, int startIndex) {
     if (tensor.number_dim - dimLevel < 1) {
         return;
 
@@ -213,7 +213,7 @@ void reshape(Tensor tensor, int new_dimension, const int *new_shape) {
 
     double *_chain = chain(tensor);
 
-    MemoryItem* newArray = create_ndim_array(new_dimension, new_shape, 0);
+    LinkedList* newArray = create_ndim_array(new_dimension, new_shape, 0);
     tensor.number_dim = new_dimension;
     tensor.mShape = (int*)malloc(new_dimension * sizeof(int));
 
@@ -228,13 +228,13 @@ void reshape(Tensor tensor, int new_dimension, const int *new_shape) {
 
 // Copy object
 Tensor copy(Tensor tensor) {
-    Tensor result = TensorInitZero(tensor.number_dim, tensor.mShape);
+    Tensor result = TensorInit(tensor.number_dim, tensor.mShape);
 
     result.mArray = copy_ndim_array(tensor.mArray, tensor.number_dim, tensor.mShape, 0);
     return result;
 }
 
-void print_ndim_array(MemoryItem* array, int dimension, int *shape, int dimLevel) {
+void print_ndim_array(LinkedList* array, int dimension, int *shape, int dimLevel) {
     if (dimension == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             printf("%lf ", array[itr].value);
@@ -256,7 +256,7 @@ void print(Tensor tensor) {
     printf("\n");
 }
 
-void unary_operation(Tensor tensor, double (*ptr2Func)(double, double), MemoryItem* array, double singleElement, MemoryItem* resArray, int dimension, const int *shape, int dimLevel) {
+void unary_operation(Tensor tensor, double (*ptr2Func)(double, double), LinkedList* array, double singleElement, LinkedList* resArray, int dimension, const int *shape, int dimLevel) {
     if (dimension == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             resArray[itr].value = (*ptr2Func)(array[itr].value, singleElement);
@@ -269,7 +269,7 @@ void unary_operation(Tensor tensor, double (*ptr2Func)(double, double), MemoryIt
     }
 }
 
-void binary_operation(Tensor tensor, double (*ptr2Func)(double, double ), MemoryItem* array1, MemoryItem* array2, MemoryItem* resArray, int dimensional, const int *shape, int dimLevel) {
+void binary_operation(Tensor tensor, double (*ptr2Func)(double, double ), LinkedList* array1, LinkedList* array2, LinkedList* resArray, int dimensional, const int *shape, int dimLevel) {
     if (dimensional == 1) {
         for (size_t itr = 0; itr < shape[dimLevel]; ++itr) {
             resArray[itr].value = (*ptr2Func)(array1[itr].value, array2[itr].value);
@@ -294,7 +294,7 @@ int check_same(int dim1, int dim2, const int *shape1, const int *shape2) {
     return succ;
 }
 
-int is_equal(MemoryItem* array1, MemoryItem* array2, int dimensional, const int *shape, int dimLevel) {
+int is_equal(LinkedList* array1, LinkedList* array2, int dimensional, const int *shape, int dimLevel) {
     if (dimensional == 1) {
         return array1[0].value == array2[0].value;
 
