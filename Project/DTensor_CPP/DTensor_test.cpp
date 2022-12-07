@@ -31,6 +31,8 @@ int main(int argc, char **argv) {
     }
     assert(test1[0][0] == Tensor<int>(0));
 
+    test1.to_file("test1.dte");
+
     cout << "test1:" << endl;
     test1.print();
 

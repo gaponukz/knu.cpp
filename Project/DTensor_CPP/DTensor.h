@@ -1,5 +1,8 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 
+using namespace std;
 // Abstract data type linked list
 template<typename TYPE>struct LinkedList{
     TYPE value;
@@ -27,6 +30,9 @@ public:
     };
 
     TYPE* chain();
+    void fill_array_from_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex);
+    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape, int dimLevel);
+    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape);
 
     Tensor<TYPE> &operator=(const Tensor<TYPE> &other);
     Tensor<TYPE> &operator[](int i);
@@ -44,6 +50,7 @@ public:
 
     void print();
     void write(std::ostream &stream);
+    void to_file(const std::string &filename);
 
     static TYPE sum(TYPE x, TYPE y) { return x + y; };
     static TYPE sub(TYPE x, TYPE y) { return x - y; };
@@ -60,14 +67,11 @@ private:
     int *mShape;
 
     Tensor(LinkedList<TYPE> *array, int dimension, const int *shape);
-    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape, int dimLevel);
-    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape);
     LinkedList<TYPE> *copy_ndim_array(LinkedList<TYPE> *array,int dimension, const int *shape,  int dimLevel);
 
     void delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel);
     void delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape);
     void create_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *resArray, int &startIndex);
-    void fill_array_from_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex);
 
     void print_ndim_array(std::ostream &stream, LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel);
     void copy_values(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimension, const int *shape, int dimLevel);
@@ -498,3 +502,46 @@ template <typename TYPE>bool Tensor<TYPE>::is_equal(LinkedList<TYPE> *array1, Li
     return success;
     }
 }
+
+template <typename TYPE>void Tensor<TYPE>::to_file(const std::string &filename) {
+    std::ofstream fs(filename, std::ios::out | std::ios::binary | std::ios::app);
+    int* _shape = shape();
+    TYPE* _chain = chain();
+
+    int amount = 1;
+
+    for (size_t itr = 0; itr < number_dim; ++itr) {
+        amount *= mShape[itr];
+    }
+
+    fs.write(reinterpret_cast<const char *>(&number_dim), sizeof(number_dim));
+    fs.write(reinterpret_cast<const char *>(&_chain[0]), amount*sizeof(TYPE));
+    fs.write(reinterpret_cast<const char *>(&_shape[0]), number_dim*sizeof(int));
+    fs.close();
+}
+
+template <typename TYPE>Tensor<TYPE> from_file(const std::string &filename) {
+    ifstream fs(filename, ios::in | ios::binary | std::ios::app);
+    int _number_dim;
+    int* _shape;
+    TYPE* _chain;
+    int amount = 1;
+    int startIndex = 0;
+
+    fs.read((char *)(&_number_dim), sizeof(_number_dim));
+    fs.read((char *)(&_shape[0]), _number_dim*sizeof(int));
+
+    for (size_t itr = 0; itr < _number_dim; ++itr) {
+        amount *= _shape[itr];
+    }
+
+    fs.read((char *)(&_chain[0]), amount*sizeof(TYPE));
+    fs.close();
+
+    Tensor<TYPE> _new(_number_dim, _shape);
+    LinkedList<TYPE>* newArray = _new.create_ndim_array(_number_dim, _shape);
+
+    _new.fill_array_from_chain(newArray, _number_dim, _chain, startIndex);
+    
+    return _new;
+};
