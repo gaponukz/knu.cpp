@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include "DTensor.h"
+#include "DTensor.cpp"
 
 using namespace std;
 

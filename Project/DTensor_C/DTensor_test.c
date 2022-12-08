@@ -1,4 +1,5 @@
 #include "DTensor.h"
+#include "DTensor.c"
 #include "stdio.h"
 
 double sum(double a, double b) {
@@ -24,5 +25,10 @@ int main(int argc, char **argv) {
     Tensor test2 = add(test1, 3);
 
     print(test2);
+    const int new_shape[2] = {3, 2};
+    Tensor test3 = reshape(test2, 2, new_shape);
+
+    print(test3);
+
     return 0;
 }
