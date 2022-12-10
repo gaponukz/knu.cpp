@@ -19,20 +19,25 @@ int main(int argc, char **argv) {
     const short int m = 3;
 
     int shape[dim] = {n, m};
-    Tensor<int> test1(dim, shape);
+    Tensor test1(dim, shape);
 
-    assert(test1[0][0] == Tensor<int>(0));
+    assert(test1[0][0] == Tensor(0));
 
     int x = 0;
     for (int i = 0; i < n; ++i){
         for (int j = 0; j < m; ++j){
-            test1[i][j] = Tensor<int>(x);
+            test1[i][j] = Tensor(x);
             x++;
         }
     }
-    assert(test1[0][0] == Tensor<int>(0));
+    assert(test1[0][0] == Tensor(0));
 
     test1.to_file("test1.dte");
+
+    Tensor test_from_file = from_file("test1.dte");
+    // test_from_file.print();
+
+    assert(test_from_file == test1);
 
     cout << "test1:" << endl;
     test1.print();
@@ -49,7 +54,7 @@ int main(int argc, char **argv) {
     assert(test1 == test2);
 
     test2.reshape(2, new_shape);
-    assert(test2[0][0] == Tensor<int >(0));
+    assert(test2[0][0] == Tensor(0));
 
     cout << "test1 after reshape:" << endl;
     test2.print();

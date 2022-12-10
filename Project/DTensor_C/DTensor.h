@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "string.h"
 
 #define TENSOR_INIT_1_ARGS(x) TensorInitOne(x)
 #define TENSOR_INIT_2_ARGS(x, y) TensorInitZero(x, y)
@@ -71,3 +72,9 @@ void binary_operation(Tensor tensor, double (*ptr2Func)(double, double ), Linked
 int check_same(int dim1, int dim2, const int *shape1, const int *shape2);
 
 int is_equal(LinkedList* array1, LinkedList* array2, int dimensional, const int *shape, int dimLevel);
+
+void set_marray(Tensor tensor, LinkedList* new_marray);
+
+void to_file(Tensor tensor, const char filename[]);
+
+Tensor from_file(const char filename[]);

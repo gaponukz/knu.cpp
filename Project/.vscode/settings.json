@@ -47,6 +47,7 @@
         "xutility": "cpp",
         "stdio.h": "c",
         "stdarg.h": "c",
-        "string": "c"
+        "string": "c",
+        "string.h": "c"
     }
 }

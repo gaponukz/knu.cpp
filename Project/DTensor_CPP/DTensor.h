@@ -3,20 +3,20 @@
 #include <string>
 
 using namespace std;
-// Abstract data type linked list
-template<typename TYPE>struct LinkedList{
-    TYPE value;
+// Abstract data double linked list
+struct LinkedList{
+    double value;
     LinkedList *next;
 };
 
 // Main class
-template<typename TYPE>class Tensor {
+class Tensor {
 public:
     Tensor();
     ~Tensor();
     Tensor(int dimension, const int *shape);
 
-    explicit Tensor(TYPE element);
+    explicit Tensor(double element);
     void reshape(int new_dimension, const int *new_shape);
 
     int dimension() { return number_dim; };
@@ -29,33 +29,34 @@ public:
         return result_shape;
     };
 
-    TYPE* chain();
-    void fill_array_from_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *_chain, int &startIndex);
-    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape, int dimLevel);
-    LinkedList<TYPE> *create_ndim_array(int dimension, const int *shape);
+    double* chain();
+    void fill_array_from_chain(LinkedList *array, int dimLevel, double *_chain, int &startIndex);
+    LinkedList *create_ndim_array(int dimension, const int *shape, int dimLevel);
+    LinkedList *create_ndim_array(int dimension, const int *shape);
 
-    Tensor<TYPE> &operator=(const Tensor<TYPE> &other);
-    Tensor<TYPE> &operator[](int i);
-    Tensor<TYPE> &operator+(const Tensor<TYPE> &other);
-    Tensor<TYPE> &operator-(const Tensor<TYPE> &other);
-    Tensor<TYPE> &operator*(const Tensor<TYPE> &other);
-    Tensor<TYPE> &operator/(const Tensor<TYPE> &other);
-    Tensor<TYPE> &operator+(TYPE singleElement);
-    Tensor<TYPE> &operator-(TYPE singleElement);
-    Tensor<TYPE> &operator*(TYPE singleElement);
-    Tensor<TYPE> &operator/(TYPE singleElement);
-    bool operator==(const Tensor<TYPE> &other);
+    Tensor &operator=(const Tensor &other);
+    Tensor &operator[](int i);
+    Tensor &operator+(const Tensor &other);
+    Tensor &operator-(const Tensor &other);
+    Tensor &operator*(const Tensor &other);
+    Tensor &operator/(const Tensor &other);
+    Tensor &operator+(double singleElement);
+    Tensor &operator-(double singleElement);
+    Tensor &operator*(double singleElement);
+    Tensor &operator/(double singleElement);
+    bool operator==(const Tensor &other);
     
-    Tensor<TYPE> &copy();
+    Tensor &copy();
 
     void print();
     void write(std::ostream &stream);
     void to_file(const std::string &filename);
+    void set_marray(LinkedList * new_marray);
 
-    static TYPE sum(TYPE x, TYPE y) { return x + y; };
-    static TYPE sub(TYPE x, TYPE y) { return x - y; };
-    static TYPE mul(TYPE x, TYPE y) { return x * y; };
-    static TYPE div(TYPE x, TYPE y) {
+    static double sum(double x, double y) { return x + y; };
+    static double sub(double x, double y) { return x - y; };
+    static double mul(double x, double y) { return x * y; };
+    static double div(double x, double y) {
         if (y == 0) throw std::invalid_argument("Divide by zero");
         return x / y;
     };
@@ -63,21 +64,21 @@ public:
 private:
 
     int number_dim = 0;
-    LinkedList<TYPE> *mArray;
+    LinkedList *mArray;
     int *mShape;
 
-    Tensor(LinkedList<TYPE> *array, int dimension, const int *shape);
-    LinkedList<TYPE> *copy_ndim_array(LinkedList<TYPE> *array,int dimension, const int *shape,  int dimLevel);
+    Tensor(LinkedList *array, int dimension, const int *shape);
+    LinkedList *copy_ndim_array(LinkedList *array,int dimension, const int *shape,  int dimLevel);
 
-    void delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel);
-    void delete_ndim_array(LinkedList<TYPE> *array, int dimension, const int *shape);
-    void create_chain(LinkedList<TYPE> *array, int dimLevel, TYPE *resArray, int &startIndex);
+    void delete_ndim_array(LinkedList *array, int dimension, const int *shape, int dimLevel);
+    void delete_ndim_array(LinkedList *array, int dimension, const int *shape);
+    void create_chain(LinkedList *array, int dimLevel, double *resArray, int &startIndex);
 
-    void print_ndim_array(std::ostream &stream, LinkedList<TYPE> *array, int dimension, const int *shape, int dimLevel);
-    void copy_values(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimension, const int *shape, int dimLevel);
-    void unary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), LinkedList<TYPE> *array, TYPE singleElement, LinkedList<TYPE> *resArray, int dimension, const int *shape, int dimLevel);
-    void binary_operation(TYPE (*ptr2Func)(TYPE , TYPE ), LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, LinkedList<TYPE> *resArray, int dimensional, const int *shape, int dimLevel);
-    bool is_equal(LinkedList<TYPE> *array1, LinkedList<TYPE> *array2, int dimensional, const int *shape, int dimLevel);
+    void print_ndim_array(std::ostream &stream, LinkedList *array, int dimension, const int *shape, int dimLevel);
+    void copy_values(LinkedList *array1, LinkedList *array2, int dimension, const int *shape, int dimLevel);
+    void unary_operation(double (*ptr2Func)(double , double ), LinkedList *array, double singleElement, LinkedList *resArray, int dimension, const int *shape, int dimLevel);
+    void binary_operation(double (*ptr2Func)(double , double ), LinkedList *array1, LinkedList *array2, LinkedList *resArray, int dimensional, const int *shape, int dimLevel);
+    bool is_equal(LinkedList *array1, LinkedList *array2, int dimensional, const int *shape, int dimLevel);
 };
 
-template <typename TYPE>Tensor<TYPE> from_file(const std::string &filename);
+Tensor from_file(const std::string &filename);

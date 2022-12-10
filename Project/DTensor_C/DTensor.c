@@ -281,3 +281,17 @@ int is_equal(LinkedList* array1, LinkedList* array2, int dimensional, const int 
     return success;
     }
 }
+
+void set_marray(Tensor tensor, LinkedList* new_marray) {
+    tensor.mArray = new_marray;
+}
+
+void to_file(Tensor tensor, const char filename[]) {
+    // TODO: logic
+}
+
+Tensor from_file(const char filename[]) {
+    Tensor _new = TensorInit(0);
+    // TODO: logic
+    return _new;
+};
